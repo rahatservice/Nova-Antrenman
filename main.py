@@ -1,11 +1,15 @@
 import discord
 from discord.ext import commands
 import random
+import os
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix=".", intents=intents)
+
+# TOKEN (Railway Variables)
+TOKEN = os.getenv("TOKEN")
 
 # Kanal ID'leri
 ANTRENMAN_KANAL = 1503342068821655653
@@ -87,4 +91,4 @@ async def kaleci(ctx):
     else:
         await ctx.send("⚽ GOL!")
 
-bot.run("TOKEN")
+bot.run(TOKEN)
