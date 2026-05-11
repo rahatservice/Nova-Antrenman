@@ -8,27 +8,22 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix=".", intents=intents)
 
-# TOKEN (Railway Variables)
 TOKEN = os.getenv("TOKEN")
 
-# Kanal ID'leri
 ANTRENMAN_KANAL = 1503342068821655653
 PEN_KANAL = 1503342071019470941
 
-# Sayaç sistemi
+ROLE_ID = 1503341767049740369
+
 sayaclar = {}
 
-# ---------------- ANTRENMAN SAYACI ---------------- #
+@bot.command()
+async def title(ctx, *, mesaj=None):
 
-@bot.event
-async def on_message(message):
+    # ---------------- ANTRENMAN ---------------- #
+    if ctx.channel.id == ANTRENMAN_KANAL:
 
-    if message.author.bot:
-        return
-
-    if message.channel.id == ANTRENMAN_KANAL:
-
-        user_id = message.author.id
+        user_id = ctx.author.id
 
         if user_id not in sayaclar:
             sayaclar[user_id] = 0
@@ -36,59 +31,48 @@ async def on_message(message):
         sayaclar[user_id] += 1
 
         if sayaclar[user_id] < 5:
-
-            await message.channel.send(
-                f"{message.author.mention} antrenman: {sayaclar[user_id]}/5"
-            )
-
+            await ctx.send(f"{ctx.author.mention} antrenman: {sayaclar[user_id]}/5")
         else:
-
-            await message.channel.send(
-                f".dver {message.author.mention} 3m ant"
-            )
-
             sayaclar[user_id] = 0
 
-    await bot.process_commands(message)
+            role_mention = f"<@&{ROLE_ID}>"
 
-# ---------------- PENALTI ---------------- #
+            await ctx.send(
+                f"🏁 5/5 antrenman tamamlandı!\n"
+                f"{role_mention} ilgilenecektir."
+            )
 
-@bot.command()
-async def pen(ctx):
+        return
 
-    if ctx.channel.id != PEN_KANAL:
-        kanal = bot.get_channel(PEN_KANAL)
-        return await ctx.send(
-            f"Bu komut sadece {kanal.mention} kanalında kullanılabilir."
-        )
+    # ---------------- PEN / KALE ---------------- #
+    if ctx.channel.id == PEN_KANAL:
 
-    sonuc = random.choice(["gol", "kale"])
+        if mesaj is None:
+            await ctx.send("Kullanım: .title pen veya .title kaleci")
+            return
 
-    if sonuc == "gol":
-        await ctx.send("⚽ GOL!")
-        await ctx.send(f".dver {ctx.author.mention} 2m")
+        mesaj = mesaj.lower()
 
-    else:
-        await ctx.send("🥅 KALE!")
+        if mesaj == "pen":
+            sonuc = random.choice(["gol", "kale"])
 
-# ---------------- KALECİ ---------------- #
+            if sonuc == "gol":
+                await ctx.send(f"⚽ GOL! {ctx.author.mention} 2m ceza")
+            else:
+                await ctx.send("🥅 KALE!")
 
-@bot.command()
-async def kaleci(ctx):
+        elif mesaj == "kaleci":
+            sonuc = random.choice(["gol", "kaleci"])
 
-    if ctx.channel.id != PEN_KANAL:
-        kanal = bot.get_channel(PEN_KANAL)
-        return await ctx.send(
-            f"Bu komut sadece {kanal.mention} kanalında kullanılabilir."
-        )
+            if sonuc == "kaleci":
+                await ctx.send(f"🧤 KALECİ KURTARDI! {ctx.author.mention} 2m ceza")
+            else:
+                await ctx.send("⚽ GOL!")
 
-    sonuc = random.choice(["gol", "kaleci"])
-
-    if sonuc == "kaleci":
-        await ctx.send("🧤 KALECİ KURTARDI!")
-        await ctx.send(f".dver {ctx.author.mention} 2m")
+        else:
+            await ctx.send("Sadece: pen veya kaleci yazabilirsin")
 
     else:
-        await ctx.send("⚽ GOL!")
+        await ctx.send("Bu komut sadece belirlenen kanalda kullanılabilir.")
 
 bot.run(TOKEN)
