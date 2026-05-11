@@ -19,52 +19,73 @@ sayaclar = {}
 # ---------------- ANTRENMAN ---------------- #
 @bot.command()
 async def ant(ctx):
-
     if ctx.channel.id != ANTRENMAN_KANAL:
-        return await ctx.send("Bu komut sadece antrenman kanalında kullanılabilir.")
+        return await ctx.send("❌ Bu komut sadece antrenman kanalında kullanılabilir.")
 
     user_id = ctx.author.id
-
     if user_id not in sayaclar:
         sayaclar[user_id] = 0
 
     sayaclar[user_id] += 1
 
     if sayaclar[user_id] < 5:
-        await ctx.send(f"{ctx.author.mention} antrenman: {sayaclar[user_id]}/5")
+        embed = discord.Embed(
+            title="🏃 Antrenman Devam Ediyor",
+            description=f"{ctx.author.mention}, disiplin başarıyı getirir!\n\n**İlerleme:** `{sayaclar[user_id]}/5`",
+            color=discord.Color.blue()
+        )
+        await ctx.send(embed=embed)
     else:
         sayaclar[user_id] = 0
-        await ctx.send(
-            f"🏁 5/5 antrenman tamamlandı!\n"
-            f"<@&{ROLE_ID}> ilgilenecektir."
+        embed = discord.Embed(
+            title="✅ Antrenman Tamamlandı!",
+            description=f"Tebrikler {ctx.author.mention}, 5 set antrenmanı başarıyla bitirdin.\n\n🔔 <@&{ROLE_ID}>, bir sporcu eğitimini tamamladı!",
+            color=discord.Color.green()
         )
+        await ctx.send(embed=embed)
 
 # ---------------- PENALTI ---------------- #
 @bot.command()
 async def pen(ctx):
-
     if ctx.channel.id != PEN_KANAL:
-        return await ctx.send("Bu komut sadece penaltı kanalında kullanılabilir.")
+        return await ctx.send("❌ Bu komut sadece penaltı kanalında kullanılabilir.")
 
     sonuc = random.choice(["gol", "kale"])
-
+    
     if sonuc == "gol":
-        await ctx.send(f"⚽ GOL! {ctx.author.mention} 2m ceza")
+        embed = discord.Embed(
+            title="⚽ MUHTEŞEM GOL!",
+            description=f"{ctx.author.mention} topu ağlara gönderdi!\n\n💰 **Ödül:** 2m Ceza",
+            color=discord.Color.gold()
+        )
     else:
-        await ctx.send("🥅 KALE!")
+        embed = discord.Embed(
+            title="🏟️ DIŞARIYA!",
+            description=f"{ctx.author.mention} topu kaleye sokamadı, şansını tekrar dene!",
+            color=discord.Color.red()
+        )
+    await ctx.send(embed=embed)
 
 # ---------------- KALECİ ---------------- #
 @bot.command()
 async def kaleci(ctx):
-
     if ctx.channel.id != PEN_KANAL:
-        return await ctx.send("Bu komut sadece penaltı kanalında kullanılabilir.")
+        return await ctx.send("❌ Bu komut sadece penaltı kanalında kullanılabilir.")
 
     sonuc = random.choice(["gol", "kaleci"])
 
     if sonuc == "kaleci":
-        await ctx.send(f"🧤 KALECİ KURTARDI! {ctx.author.mention} 2m ceza")
+        embed = discord.Embed(
+            title="🧤 DEVLEŞEN KALECİ!",
+            description=f"{ctx.author.mention} kalesinde duvar ördü!\n\n💰 **Ödül:** 2m Ceza",
+            color=discord.Color.purple()
+        )
     else:
-        await ctx.send("⚽ GOL!")
+        embed = discord.Embed(
+            title="⚽ TOP AĞLARDA!",
+            description=f"{ctx.author.mention} bu sefer topu çıkaramadı...",
+            color=discord.Color.orange()
+        )
+    await ctx.send(embed=embed)
 
 bot.run(TOKEN)
